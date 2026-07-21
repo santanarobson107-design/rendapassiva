@@ -1,0 +1,74 @@
+[
+  {
+    "symbol": "PETR4",
+    "name": "Petróleo Brasileiro S.A.",
+    "price": 28.50,
+    "dividend": 2.10,
+    "dy": 7.37,
+    "nextPayment": "2024-08-15",
+    "sector": "Energia"
+  },
+  {
+    "symbol": "VALE3",
+    "name": "Vale S.A.",
+    "price": 65.40,
+    "dividend": 4.80,
+    "dy": 7.34,
+    "nextPayment": "2024-08-10",
+    "sector": "Mineração"
+  },
+  {
+    "symbol": "ITUB4",
+    "name": "Itaú Unibanco Holding S.A.",
+    "price": 27.80,
+    "dividend": 1.85,
+    "dy": 6.65,
+    "nextPayment": "2024-08-20",
+    "sector": "Finanças"
+  },
+  {
+    "symbol": "BBAS3",
+    "name": "Banco do Brasil S.A.",
+    "price": 35.20,
+    "dividend": 2.40,
+    "dy": 6.82,
+    "nextPayment": "2024-08-25",
+    "sector": "Finanças"
+  },
+  {
+    "symbol": "WEGE3",
+    "name": "WEG S.A.",
+    "price": 45.30,
+    "dividend": 2.15,
+    "dy": 4.74,
+    "nextPayment": "2024-08-12",
+    "sector": "Industrial"
+  },
+  {
+    "symbol": "MGLU3",
+    "name": "Magazine Luiza S.A.",
+    "price": 18.50,
+    "dividend": 0.95,
+    "dy": 5.13,
+    "nextPayment": "2024-08-18",
+    "sector": "Varejo"
+  },
+  {
+    "symbol": "RENT3",
+    "name": "Localiza Rent a Car",
+    "price": 92.80,
+    "dividend": 6.50,
+    "dy": 7.00,
+    "nextPayment": "2024-08-22",
+    "sector": "Serviços"
+  },
+  {
+    "symbol": "BRDT11",
+    "name": "Petrobras Distribuidora S.A.",
+    "price": 38.40,
+    "dividend": 3.20,
+    "dy": 8.33,
+    "nextPayment": "2024-08-16",
+    "sector": "Energia"
+  }
+]
