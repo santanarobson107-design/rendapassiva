@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renda Passiva - Simulador de Ações e FIIs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --success-color: #4CAF50;
+            --dark-color: #1a1a1a;
+            --light-color: #f5f5f5;
+            --border-color: #ddd;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* NAVEGAÇÃO */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* SEÇÕES */
+        .section {
+            padding: 4rem 0;
+            background-color: white;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--dark-color);
+            text-align: center;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 6rem 0;
+        }
+
+        .hero-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* BOTÕES */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0b7dda;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* BUSCA */
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            min-width: 300px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        /* TABELAS */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .data-table thead th {
+            padding: 1.2rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table tbody td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f0f8ff;
+        }
+
+        .dy-badge {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* INPUTS */
+        .input-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .input-group input {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        /* SIMULADOR */
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .simulator-input {
+            background: #f9f9f9;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .simulator-output {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .result-card h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .result-value.highlight {
+            color: var(--success-color);
+            font-size: 2rem;
+        }
+
+        .simulator-chart {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* CALENDÁRIO */
+        .calendar-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .current-month {
+            font-size: 1.3rem;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .calendar-day {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            text-align: center;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .calendar-day:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .calendar-day.has-dividend {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.5;
+        }
+
+        .dividends-list ul {
+            list-style: none;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .dividends-list li {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* RANKING */
+        .ranking-filters {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* FOOTER */
+        .footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 3px solid var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+            .simulator-output {
+                grid-template-columns: 1fr;
+            }
+            .search-input {
+                min-width: 100%;
+            }
+            .nav-links {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegação -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>💰 Renda Passiva</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a class="nav-link active" onclick="scrollToSection('home')">Home</a></li>
+                <li><a class="nav-link" onclick="scrollToSection('acoes')">📈 Ações</a></li>
+                <li><a class="nav-link" onclick="scrollToSection('fiis')">🏢 FIIs</a></li>
+                <li><a class="nav-link" onclick="scrollToSection('calendario')">📅 Agenda</a></li>
+                <li><a class="nav-link" onclick="scrollToSection('ranking')">💰 Ranking DY</a></li>
+                <li><a class="nav-link" onclick="scrollToSection('simulador')">🧮 Simulador</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Home -->
+    <section id="home" class="section hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Bem-vindo ao Simulador de Renda Passiva</h2>
+                <p>Calcule sua renda passiva com ações e FIIs. Acompanhe dividendos, analise rentabilidade e otimize seus investimentos.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToSection('simulador')">Começar Simulação</button>
+                    <button class="btn btn-secondary" onclick="scrollToSection('ranking')">Ver Rankings</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ações -->
+    <section id="acoes" class="section">
+        <div class="container">
+            <h2>📈 Ações com Dividendos</h2>
+            <div class="search-bar">
+                <input type="text" id="searchStocks" placeholder="Buscar ação (ex: PETR4, VALE3)..." class="search-input">
+                <button class="btn btn-small btn-primary" onclick="filterStocks()">Buscar</button>
+            </div>
+            <table class="data-table" id="stocksTable">
+                <thead>
+                    <tr>
+                        <th>Ação</th>
+                        <th>Preço</th>
+                        <th>Dividendo/Ação</th>
+                        <th>DY (%)</th>
+                        <th>Próximo Pagamento</th>
+                    </tr>
+                </thead>
+                <tbody id="stocksBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FIIs -->
+    <section id="fiis" class="section">
+        <div class="container">
+            <h2>🏢 Fundos de Investimento Imobiliário (FIIs)</h2>
+            <div class="search-bar">
+                <input type="text" id="searchFiis" placeholder="Buscar FII (ex: HGLG11, XPML11)..." class="search-input">
+                <button class="btn btn-small btn-primary" onclick="filterFiis()">Buscar</button>
+            </div>
+            <table class="data-table" id="fiisTable">
+                <thead>
+                    <tr>
+                        <th>FII</th>
+                        <th>Preço</th>
+                        <th>Distribuição/cota</th>
+                        <th>DY (%)</th>
+                        <th>Próximo Pagamento</th>
+                    </tr>
+                </thead>
+                <tbody id="fiisBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Agenda de Dividendos -->
+    <section id="calendario" class="section">
+        <div class="container">
+            <h2>📅 Agenda de Dividendos</h2>
+            <div class="calendar-controls">
+                <button class="btn btn-small" onclick="previousMonth()">&lt; Mês Anterior</button>
+                <span id="currentMonth" class="current-month"></span>
+                <button class="btn btn-small" onclick="nextMonth()">Próximo Mês &gt;</button>
+            </div>
+            <div class="calendar" id="calendar"></div>
+            <div class="dividends-list">
+                <h3>Dividendos do Mês</h3>
+                <ul id="monthDividends"></ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ranking de Dividend Yield -->
+    <section id="ranking" class="section">
+        <div class="container">
+            <h2>💰 Ranking de Dividend Yield (DY)</h2>
+            <div class="ranking-filters">
+                <button class="filter-btn active" onclick="filterByType('all', event)">Todos</button>
+                <button class="filter-btn" onclick="filterByType('stocks', event)">Ações</button>
+                <button class="filter-btn" onclick="filterByType('fiis', event)">FIIs</button>
+            </div>
+            <table class="data-table ranking-table" id="rankingTable">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Ativo</th>
+                        <th>Tipo</th>
+                        <th>Preço</th>
+                        <th>DY (%)</th>
+                        <th>Renda Anual por Ativo</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Simulador de Renda -->
+    <section id="simulador" class="section">
+        <div class="container">
+            <h2>🧮 Simulador de Renda Passiva</h2>
+            <div class="simulator-container">
+                <div class="simulator-input">
+                    <div class="input-group">
+                        <label for="initialInvestment">Investimento Inicial (R$):</label>
+                        <input type="number" id="initialInvestment" placeholder="Ex: 10000" min="0" step="100" value="10000">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="monthlyInvestment">Aporte Mensal (R$):</label>
+                        <input type="number" id="monthlyInvestment" placeholder="Ex: 1000" min="0" step="100" value="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="averageDY">Dividend Yield Médio (%):</label>
+                        <input type="number" id="averageDY" placeholder="Ex: 8" min="0" max="100" step="0.1" value="8">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="years">Período (anos):</label>
+                        <input type="number" id="years" placeholder="Ex: 10" min="1" max="50" step="1" value="10">
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <input type="checkbox" id="reinvestment" checked>
+                            Reinvestir dividendos?
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="simulateIncome()" style="width: 100%; padding: 1rem;">Calcular Renda</button>
+                </div>
+
+                <div class="simulator-output">
+                    <div class="result-card">
+                        <h3>Capital Investido</h3>
+                        <p class="result-value" id="totalInvested">R$ 0,00</p>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Renda Total de Dividendos</h3>
+                        <p class="result-value" id="totalDividends">R$ 0,00</p>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Patrimônio Total</h3>
+                        <p class="result-value highlight" id="totalPatrimony">R$ 0,00</p>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>Renda Mensal Estimada</h3>
+                        <p class="result-value" id="monthlyIncome">R$ 0,00</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulator-chart">
+                <h3 style="text-align: center; margin-bottom: 2rem;">Projeção ao Longo do Tempo</h3>
+                <canvas id="projectionChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Renda Passiva. Todos os direitos reservados.</p>
+            <p>⚠️ Este simulador é apenas para fins educacionais. Consulte um especialista em investimentos.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ========== DADOS ==========
+        const stocksData = [
+            { symbol: 'PETR4', price: 28.50, dividend: 2.10, dy: 7.37, nextPayment: '2024-08-15' },
+            { symbol: 'VALE3', price: 65.40, dividend: 4.80, dy: 7.34, nextPayment: '2024-08-10' },
+            { symbol: 'ITUB4', price: 27.80, dividend: 1.85, dy: 6.65, nextPayment: '2024-08-20' },
+            { symbol: 'BBAS3', price: 35.20, dividend: 2.40, dy: 6.82, nextPayment: '2024-08-25' },
+            { symbol: 'WEGE3', price: 45.30, dividend: 2.15, dy: 4.74, nextPayment: '2024-08-12' },
+            { symbol: 'MGLU3', price: 18.50, dividend: 0.95, dy: 5.13, nextPayment: '2024-08-18' },
+            { symbol: 'RENT3', price: 92.80, dividend: 6.50, dy: 7.00, nextPayment: '2024-08-22' },
+            { symbol: 'BRDT11', price: 38.40, dividend: 3.20, dy: 8.33, nextPayment: '2024-08-16' }
+        ];
+
+        const fiisData = [
+            { symbol: 'HGLG11', price: 144.50, distribution: 12.80, dy: 8.85, nextPayment: '2024-08-10' },
+            { symbol: 'XPML11', price: 128.30, distribution: 11.20, dy: 8.72, nextPayment: '2024-08-15' },
+            { symbol: 'KNRI11', price: 132.40, distribution: 10.50, dy: 7.93, nextPayment: '2024-08-12' },
+            { symbol: 'RBRR11', price: 116.20, distribution: 9.80, dy: 8.43, nextPayment: '2024-08-20' },
+            { symbol: 'MXRF11', price: 10.55, distribution: 0.95, dy: 9.01, nextPayment: '2024-08-18' },
+            { symbol: 'CSHG11', price: 124.60, distribution: 10.20, dy: 8.18, nextPayment: '2024-08-25' },
+            { symbol: 'BCFF11', price: 117.80, distribution: 9.50, dy: 8.06, nextPayment: '2024-08-22' },
+            { symbol: 'VGFI11', price: 145.30, distribution: 13.50, dy: 9.29, nextPayment: '2024-08-16' }
+        ];
+
+        const dividendSchedule = {
+            '2024-08-10': [{ symbol: 'VALE3', amount: 4.80, type: 'stock' }, { symbol: 'HGLG11', amount: 12.80, type: 'fii' }],
+            '2024-08-12': [{ symbol: 'WEGE3', amount: 2.15, type: 'stock' }, { symbol: 'KNRI11', amount: 10.50, type: 'fii' }],
+            '2024-08-15': [{ symbol: 'PETR4', amount: 2.10, type: 'stock' }, { symbol: 'XPML11', amount: 11.20, type: 'fii' }],
+            '2024-08-16': [{ symbol: 'BRDT11', amount: 3.20, type: 'stock' }, { symbol: 'VGFI11', amount: 13.50, type: 'fii' }],
+            '2024-08-18': [{ symbol: 'MGLU3', amount: 0.95, type: 'stock' }, { symbol: 'CSHG11', amount: 10.20, type: 'fii' }],
+            '2024-08-20': [{ symbol: 'ITUB4', amount: 1.85, type: 'stock' }, { symbol: 'RBRR11', amount: 9.80, type: 'fii' }],
+            '2024-08-22': [{ symbol: 'RENT3', amount: 6.50, type: 'stock' }, { symbol: 'BCFF11', amount: 9.50, type: 'fii' }],
+            '2024-08-25': [{ symbol: 'BBAS3', amount: 2.40, type: 'stock' }]
+        };
+
+        let currentDate = new Date();
+        let chart = null;
+
+        // ========== INICIALIZAÇÃO ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStocks();
+            loadFiis();
+            initCalendar();
+            loadRanking();
+        });
+
+        // ========== FUNÇÕES ==========
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return new Date(dateString).toLocaleDateString('pt-BR', options);
+        }
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // ========== AÇÕES ==========
+        function loadStocks() {
+            const tbody = document.getElementById('stocksBody');
+            tbody.innerHTML = '';
+            
+            stocksData.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${stock.symbol}</strong></td>
+                    <td>R$ ${stock.price.toFixed(2)}</td>
+                    <td>R$ ${stock.dividend.toFixed(2)}</td>
+                    <td><span class="dy-badge">${stock.dy.toFixed(2)}%</span></td>
+                    <td>${formatDate(stock.nextPayment)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterStocks() {
+            const searchTerm = document.getElementById('searchStocks').value.toUpperCase().trim();
+            const tbody = document.getElementById('stocksBody');
+            tbody.innerHTML = '';
+            
+            const filtered = searchTerm === '' ? stocksData : stocksData.filter(stock => stock.symbol.includes(searchTerm));
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Nenhuma ação encontrada</td></tr>';
+                return;
+            }
+            
+            filtered.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${stock.symbol}</strong></td>
+                    <td>R$ ${stock.price.toFixed(2)}</td>
+                    <td>R$ ${stock.dividend.toFixed(2)}</td>
+                    <td><span class="dy-badge">${stock.dy.toFixed(2)}%</span></td>
+                    <td>${formatDate(stock.nextPayment)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ========== FIIS ==========
+        function loadFiis() {
+            const tbody = document.getElementById('fiisBody');
+            tbody.innerHTML = '';
+            
+            fiisData.forEach(fii => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${fii.symbol}</strong></td>
+                    <td>R$ ${fii.price.toFixed(2)}</td>
+                    <td>R$ ${fii.distribution.toFixed(2)}</td>
+                    <td><span class="dy-badge" style="background-color: #ff9800;">${fii.dy.toFixed(2)}%</span></td>
+                    <td>${formatDate(fii.nextPayment)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterFiis() {
+            const searchTerm = document.getElementById('searchFiis').value.toUpperCase().trim();
+            const tbody = document.getElementById('fiisBody');
+            tbody.innerHTML = '';
+            
+            const filtered = searchTerm === '' ? fiisData : fiisData.filter(fii => fii.symbol.includes(searchTerm));
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Nenhum FII encontrado</td></tr>';
+                return;
+            }
+            
+            filtered.forEach(fii => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${fii.symbol}</strong></td>
+                    <td>R$ ${fii.price.toFixed(2)}</td>
+                    <td>R$ ${fii.distribution.toFixed(2)}</td>
+                    <td><span class="dy-badge" style="background-color: #ff9800;">${fii.dy.toFixed(2)}%</span></td>
+                    <td>${formatDate(fii.nextPayment)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ========== CALENDÁRIO ==========
+        function initCalendar() {
+            renderCalendar();
+            renderMonthDividends();
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} de ${year}`;
+            
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+            
+            const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.style.cssText = 'font-weight: bold; background: #f0f0f0; padding: 0.7rem; text-align: center;';
+                dayHeader.textContent = day;
+                calendar.appendChild(dayHeader);
+            });
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const prevLastDay = new Date(year, month, 0);
+            
+            const prevDays = prevLastDay.getDate();
+            const firstDayOfWeek = firstDay.getDay();
+            
+            for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+                const dayElement = createDayElement(prevDays - i, true);
+                calendar.appendChild(dayElement);
+            }
+            
+            const daysInMonth = lastDay.getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayElement = createDayElement(day, false, dateStr);
+                calendar.appendChild(dayElement);
+            }
+            
+            const remainingDays = 42 - (firstDayOfWeek + daysInMonth);
+            for (let day = 1; day <= remainingDays; day++) {
+                const dayElement = createDayElement(day, true);
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function createDayElement(day, isOtherMonth, dateStr = null) {
+            const dayElement = document.createElement('div');
+            dayElement.className = 'calendar-day';
+            
+            if (isOtherMonth) dayElement.classList.add('other-month');
+            if (dateStr && dividendSchedule[dateStr]) dayElement.classList.add('has-dividend');
+            
+            dayElement.textContent = day;
+            return dayElement;
+        }
+
+        function renderMonthDividends() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const monthDividends = document.getElementById('monthDividends');
+            monthDividends.innerHTML = '';
+            
+            let totalDividends = 0;
+            let dividendCount = 0;
+            
+            for (let day = 1; day <= 31; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                if (dividendSchedule[dateStr]) {
+                    const dividends = dividendSchedule[dateStr];
+                    
+                    dividends.forEach(dividend => {
+                        const li = document.createElement('li');
+                        li.style.cssText = 'padding: 1rem; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between;';
+                        
+                        const badgeColor = dividend.type === 'fii' ? '#ff9800' : '#4CAF50';
+                        const typeLabel = dividend.type === 'fii' ? 'FII' : 'Ação';
+                        
+                        li.innerHTML = `
+                            <div>
+                                <strong>${dividend.symbol}</strong>
+                                <span style="background: ${badgeColor}; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 0.5rem;">${typeLabel}</span>
+                            </div>
+                            <div><strong>R$ ${dividend.amount.toFixed(2)}</strong></div>
+                        `;
+                        
+                        monthDividends.appendChild(li);
+                        totalDividends += dividend.amount;
+                        dividendCount++;
+                    });
+                }
+            }
+            
+            if (dividendCount === 0) {
+                const emptyMessage = document.createElement('li');
+                emptyMessage.style.cssText = 'padding: 1.5rem; text-align: center; color: #999;';
+                emptyMessage.textContent = 'Nenhum dividendo programado para este mês';
+                monthDividends.appendChild(emptyMessage);
+            }
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+            renderMonthDividends();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+            renderMonthDividends();
+        }
+
+        // ========== RANKING ==========
+        function loadRanking() {
+            filterByType('all', null);
+        }
+
+        function filterByType(type, event) {
+            if (event) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+            
+            let assets = [];
+            
+            if (type === 'all' || type === 'stocks') {
+                assets = assets.concat(stocksData.map(s => ({ ...s, type: 'Ação', typeShort: 'stock' })));
+            }
+            
+            if (type === 'all' || type === 'fiis') {
+                assets = assets.concat(fiisData.map(f => ({ ...f, type: 'FII', typeShort: 'fii' })));
+            }
+            
+            assets.sort((a, b) => b.dy - a.dy);
+            
+            const tbody = document.getElementById('rankingBody');
+            tbody.innerHTML = '';
+            
+            assets.forEach((asset, index) => {
+                const row = document.createElement('tr');
+                const rendaAnual = asset.price * asset.dy / 100;
+                
+                row.innerHTML = `
+                    <td><strong>#${index + 1}</strong></td>
+                    <td><strong>${asset.symbol}</strong></td>
+                    <td><span style="background-color: ${asset.typeShort === 'fii' ? '#ff9800' : '#4CAF50'}; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem;">${asset.type}</span></td>
+                    <td>R$ ${asset.price.toFixed(2)}</td>
+                    <td><strong style="color: #2196F3; font-size: 1.1rem;">${asset.dy.toFixed(2)}%</strong></td>
+                    <td>R$ ${rendaAnual.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ========== SIMULADOR ==========
+        function simulateIncome() {
+            const initialInvestment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+            const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value) || 0;
+            const averageDY = parseFloat(document.getElementById('averageDY').value) || 0;
+            const years = parseInt(document.getElementById('years').value) || 0;
+            const reinvest = document.getElementById('reinvestment').checked;
+
+            if (initialInvestment < 0 || monthlyInvestment < 0 || averageDY < 0 || years < 1) {
+                alert('Por favor, insira valores válidos');
+                return;
+            }
+
+            const months = years * 12;
+            const monthlyRate = (averageDY / 100) / 12;
+            
+            let capital = initialInvestment;
+            let totalDividends = 0;
+            let totalInvested = initialInvestment;
+            const monthlyData = [];
+
+            for (let month = 0; month < months; month++) {
+                capital += monthlyInvestment;
+                totalInvested += monthlyInvestment;
+
+                const monthlyDividend = capital * monthlyRate;
+                totalDividends += monthlyDividend;
+
+                if (reinvest) {
+                    capital += monthlyDividend;
+                }
+
+                if (month % 12 === 0 || month === months - 1) {
+                    monthlyData.push({
+                        month: month + 1,
+                        capital: capital,
+                        invested: totalInvested,
+                        dividends: totalDividends
+                    });
+                }
+            }
+
+            const monthlyIncomeEstimated = capital * monthlyRate;
+
+            document.getElementById('totalInvested').textContent = formatCurrency(totalInvested);
+            document.getElementById('totalDividends').textContent = formatCurrency(totalDividends);
+            document.getElementById('totalPatrimony').textContent = formatCurrency(capital);
+            document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncomeEstimated);
+
+            updateProjectionChart(monthlyData, years);
+        }
+
+        function updateProjectionChart(data, years) {
+            const canvas = document.getElementById('projectionChart');
+            const ctx = canvas.getContext('2d');
+
+            if (chart) chart.destroy();
+
+            const labels = data.map(d => `Mês ${d.month}`);
+            const capitalData = data.map(d => d.capital);
+            const investedData = data.map(d => d.invested);
+            const dividendsData = data.map(d => d.dividends);
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Capital Total',
+                            data: capitalData,
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#4CAF50'
+                        },
+                        {
+                            label: 'Capital Investido',
+                            data: investedData,
+                            borderColor: '#2196F3',
+                            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#2196F3'
+                        },
+                        {
+                            label: 'Dividendos Acumulados',
+                            data: dividendsData,
+                            borderColor: '#ff9800',
+                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#ff9800'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        title: { display: true, text: `Projeção de Renda Passiva em ${years} anos` }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
